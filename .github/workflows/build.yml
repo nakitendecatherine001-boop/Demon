@@ -5,16 +5,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Build APK
-        run: ./gradlew assembleDebug
+
+      - name: Fix Permissions and Build
+        run: |
+          find . -name gradlew -exec chmod +x {} +
+          # This command finds the gradlew file even if it's in a subfolder
+          GRADLE_PATH=$(find . -name gradlew | head -n 1)
+          $GRADLE_PATH assembleDebug
+          
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Custom-Winlator
-          path: app/build/outputs/apk/debug/*.apk
-
+          name: Custom-Winlator-APK
+          path: "**/build/outputs/apk/debug/*.apk"
